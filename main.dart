@@ -1,9 +1,12 @@
-import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/nova_tela.dart';
+import 'package:flutter_application_1/poste.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(home: const NovaTela()));
 }
 
 class MyApp extends StatelessWidget {
@@ -33,13 +36,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -57,13 +60,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _y = 0;
-  int _x = 1;
-  TextEditingController _controlaSoma = TextEditingController();
-  Icon certo = const Icon(Icons.check);
-  Icon errado = const Icon(Icons.close);
-  Icon _saida = const Icon(Icons.question_mark);
-  Map _respostas = {};
+  int _counter = 0;
+  late Future<Poste> futuroPoste;
+
+  @override
+  void initState() {
+    super.initState();
+    futuroPoste = buscaPOSTE();
+  }
+
+  Future<Poste> buscaPOSTE() async {
+    final resposta = await http
+        .get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
+
+    if (resposta.statusCode == 200) {
+      // 200 é OK
+      return Poste.fromJson(jsonDecode(resposta.body) as Map<String, dynamic>);
+    } else {
+      throw Exception('Falha ao carregar poste.');
+    }
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -72,42 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+      _counter++;
     });
-  }
-
-  void initState() {
-    super.initState();
-    _y = Random().nextInt(10);
-  }
-
-  void alterarNumero() {
-    setState(() {
-      _x = Random().nextInt(10);
-      _respostas.clear();
-    });
-  }
-
-  void corrigir() {
-    int soma = _x + _y;
-    String digitado = _controlaSoma.text;
-    int resultado = int.parse(digitado);
-
-    setState(() {
-      if (soma == resultado) {
-        _respostas.addAll({'$_x+$_y': certo});
-        // _saida = certo;
-      } else {
-        // _saida = errado;
-        _respostas.addAll({'$_x+$_y': errado});
-      }
-    });
-
-    while ((_respostas.containsKey('$_x+$_y') &&
-        _respostas.containsValue(certo))) {
-      _y = Random().nextInt(10);
-    }
-
-    _controlaSoma.text = '';
   }
 
   @override
@@ -147,94 +129,13 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Row(
-              children: [
-                Text(
-                  '$_x + $_y = ',
-                ),
-                SizedBox(
-                    width: 50,
-                    child: TextField(
-                      controller: _controlaSoma,
-                    ))
-              ],
+            const Text(
+              'You have pushed the button this many times:',
             ),
-            ElevatedButton(
-              onPressed: corrigir,
-              child: const Text('Corrigir'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-            ElevatedButton(
-              onPressed: alterarNumero,
-              child: const Text('Trocar número'),
-            ),
-            SizedBox(
-              height: 32,
-              width: 32,
-              child: _saida,
-            ),
-            Table(
-              border: TableBorder.all(),
-              children: [
-                TableRow(children: [
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+1'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+2'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+3'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+5'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+6'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+7'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+8'],
-                    ),
-                  ),
-                  TableCell(
-                    child: SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: _respostas['$_x+9'],
-                    ),
-                  ),
-                ]),
-              ],
-            )
           ],
         ),
       ),
