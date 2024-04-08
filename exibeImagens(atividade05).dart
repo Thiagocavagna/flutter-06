@@ -35,7 +35,7 @@ class _NovaTelaState extends State<NovaTela> {
   @override
   void initState() {
     super.initState();
-    futuroPoste = buscaPOSTE(4);
+    futuroPoste = buscaPOSTE(1);
   }
 
   @override
@@ -44,36 +44,28 @@ class _NovaTelaState extends State<NovaTela> {
       appBar: AppBar(
         title: const Text('Mostrando imagem:'),
       ),
-      body: Column(
-        children: [
-          Center(
-            child: FutureBuilder<Imagens>(
-              future: futuroPoste,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Scaffold(
-                    body: Column(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                              height: 50,
-                              width: 50,
-                              child: Image.network(snapshot.data!.url)),
-                        )
-                      ],
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
+      body: Center(
+        child: FutureBuilder<Imagens>(
+          future: futuroPoste,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Scaffold(
+                body: Column(
+                  children: [
+                    Image.network(snapshot.data!.url),
+                    ElevatedButton(
+                        onPressed: novoPoste, child: const Text('Nova Imagem'))
+                  ],
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
 
-                // By default, show a loading spinner.
-                return const CircularProgressIndicator();
-              },
-            ),
-          ),
-          ElevatedButton(onPressed: novoPoste, child: const Text('Novo poste'))
-        ],
+            // By default, show a loading spinner.
+            return const CircularProgressIndicator();
+          },
+        ),
       ),
     );
   }
