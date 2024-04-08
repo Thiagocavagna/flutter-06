@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/imagens.dart';
 
-Future<Imagens> buscaPOSTE(int numero) async {
+Future<Imagens> buscaImagem(int numero) async {
   final resposta = await http
       .get(Uri.parse('https://jsonplaceholder.typicode.com/photos/$numero'));
 
@@ -23,19 +23,19 @@ class NovaTela extends StatefulWidget {
 }
 
 class _NovaTelaState extends State<NovaTela> {
-  late Future<Imagens> futuroPoste;
+  late Future<Imagens> futuroImagem;
   int contador = 1;
   void novoPoste() {
     setState(() {
       contador++;
-      futuroPoste = buscaPOSTE(contador);
+      futuroImagem = buscaImagem(contador);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    futuroPoste = buscaPOSTE(1);
+    futuroImagem = buscaImagem(1);
   }
 
   @override
@@ -46,7 +46,7 @@ class _NovaTelaState extends State<NovaTela> {
       ),
       body: Center(
         child: FutureBuilder<Imagens>(
-          future: futuroPoste,
+          future: futuroImagem,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Scaffold(
