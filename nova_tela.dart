@@ -1,41 +1,44 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/poste.dart';
-
-Future<Poste> buscaPOSTE(int numero) async {
-  final resposta = await http
-      .get(Uri.parse('https://jsonplaceholder.typicode.com/posts/$numero'));
-
-  if (resposta.statusCode == 200) {
-    // 200 é OK
-    return Poste.fromJson(jsonDecode(resposta.body) as Map<String, dynamic>);
-  } else {
-    throw Exception('Falha ao carregar poste.');
-  }
-}
 
 class NovaTela extends StatefulWidget {
-  const NovaTela({super.key});
+  const NovaTela({Key? key}) : super(key: key);
 
   @override
-  State<NovaTela> createState() => _NovaTelaState();
+  _NovaTelaState createState() => _NovaTelaState();
 }
 
 class _NovaTelaState extends State<NovaTela> {
-  late Future<Poste> futuroPoste;
+  List<String> titulos = [];
   int contador = 1;
-  void novoPoste() {
-    setState(() {
-      contador++;
-      futuroPoste = buscaPOSTE(contador);
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    futuroPoste = buscaPOSTE(4);
+    // Buscar o primeiro post ao inicializar a tela
+    buscaEAdicionaPost(contador);
+  }
+
+  Future<void> buscaEAdicionaPost(int numero) async {
+    final resposta = await http
+        .get(Uri.parse('https://jsonplaceholder.typicode.com/posts/$numero'));
+
+    if (resposta.statusCode == 200) {
+      // Se a resposta for bem-sucedida, adiciona o título à lista
+      final jsonPost = jsonDecode(resposta.body) as Map<String, dynamic>;
+      setState(() {
+        titulos.add(jsonPost['title'] as String);
+      });
+    } else {
+      throw Exception('Falha ao carregar poste.');
+    }
+  }
+
+  void novoPoste() {
+    // Incrementar o contador e buscar o próximo post
+    contador++;
+    buscaEAdicionaPost(contador);
   }
 
   @override
@@ -46,22 +49,20 @@ class _NovaTelaState extends State<NovaTela> {
       ),
       body: Column(
         children: [
-          Center(
-            child: FutureBuilder<Poste>(
-              future: futuroPoste,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(snapshot.data!.titulo);
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
-
-                // By default, show a loading spinner.
-                return const CircularProgressIndicator();
+          Expanded(
+            child: ListView.builder(
+              itemCount: titulos.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(titulos[index]),
+                );
               },
             ),
           ),
-          ElevatedButton(onPressed: novoPoste, child: const Text('Novo poste'))
+          ElevatedButton(
+            onPressed: novoPoste,
+            child: const Text('Novo poste'),
+          ),
         ],
       ),
     );
