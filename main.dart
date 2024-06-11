@@ -1,12 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application_3/nova_tela.dart';
-import 'package:flutter_application_3/poste.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_2/inicio.dart';
+import 'package:flutter_application_2/resultado.dart';
 
 void main() {
-  runApp(MaterialApp(home: const NovaTela()));
+  // runApp(const MyApp());
+  //runApp(MaterialApp(home: Resultado('Exemplo de texto')));
+  runApp(MaterialApp(home: Inicio()));
 }
 
 class MyApp extends StatelessWidget {
@@ -36,13 +35,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -61,25 +61,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  late Future<Poste> futuroPoste;
-
-  @override
-  void initState() {
-    super.initState();
-    futuroPoste = buscaPOSTE();
-  }
-
-  Future<Poste> buscaPOSTE() async {
-    final resposta = await http
-        .get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
-
-    if (resposta.statusCode == 200) {
-      // 200 é OK
-      return Poste.fromJson(jsonDecode(resposta.body) as Map<String, dynamic>);
-    } else {
-      throw Exception('Falha ao carregar poste.');
-    }
-  }
 
   void _incrementCounter() {
     setState(() {
