@@ -24,10 +24,13 @@ class LayoutBuilderExample extends StatelessWidget {
       appBar: AppBar(title: const Text('LayoutBuilder Example')),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          if (constraints.maxWidth > 600) {
-            return _buildWideContainers();
-          } else {
+          if (constraints.maxWidth <= 400) {
             return _buildNormalContainer();
+          } else if (constraints.maxWidth > 400 &&
+              constraints.maxWidth <= 800) {
+            return _build2WideContainers();
+          } else {
+            return _build3WideContainers();
           }
         },
       ),
@@ -44,20 +47,45 @@ class LayoutBuilderExample extends StatelessWidget {
     );
   }
 
-  Widget _buildWideContainers() {
+  Widget _build2WideContainers() {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Container(
-            height: 100.0,
-            width: 100.0,
+            height: 180.0,
+            width: 180.0,
             color: Colors.red,
           ),
           Container(
-            height: 100.0,
-            width: 100.0,
+            height: 180.0,
+            width: 180.0,
             color: Colors.yellow,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _build3WideContainers() {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Container(
+            height: 250.0,
+            width: 250.0,
+            color: Colors.red,
+          ),
+          Container(
+            height: 250.0,
+            width: 250.0,
+            color: Colors.yellow,
+          ),
+          Container(
+            height: 250.0,
+            width: 250.0,
+            color: Colors.green,
           ),
         ],
       ),
